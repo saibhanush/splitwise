@@ -126,6 +126,30 @@
         width: min(640px, 100%);
       }
 
+      .login-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(180px, 0.75fr);
+        gap: 12px;
+        align-items: start;
+        margin-bottom: 14px;
+      }
+
+      .sample-users {
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .sample-user {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
       .api-config {
         display: grid;
         gap: 8px;
@@ -351,6 +375,9 @@
         .fields {
           grid-template-columns: 1fr;
         }
+        .login-layout {
+          grid-template-columns: 1fr;
+        }
         .split-row {
           grid-template-columns: 1fr;
         }
@@ -381,44 +408,34 @@
         <article class="panel login-panel">
           <h2>Login</h2>
           <p class="muted">
-            If this page is on Netlify, paste your backend URL first.
+            Use one of the sample users shown beside the field.
           </p>
-          <div class="api-config">
-            <div class="field">
-              <label for="apiBaseUrl">Backend API URL</label>
-              <input
-                id="apiBaseUrl"
-                placeholder="https://your-backend.onrender.com"
-              />
-            </div>
-            <div class="actions">
-              <button type="button" class="secondary" id="saveApiBaseBtn">
-                Save API URL
-              </button>
-              <button type="button" class="secondary" id="useCurrentOriginBtn">
-                Use current origin
-              </button>
-            </div>
-            <div class="tiny">
-              Leave this blank when frontend and backend are served from the
-              same app.
+          <div class="login-layout">
+            <form id="loginForm">
+              <div class="field">
+                <label for="loginName">Existing user name</label>
+                <input
+                  id="loginName"
+                  list="userNames"
+                  placeholder="Type a real name"
+                  required
+                />
+                <datalist id="userNames"></datalist>
+              </div>
+              <div class="actions">
+                <button type="submit">Login</button>
+              </div>
+            </form>
+            <div class="sample-users">
+              <div class="tiny">Sample users</div>
+              <div id="sampleUsersBox">
+                <div class="tiny">Loading...</div>
+              </div>
             </div>
           </div>
-          <form id="loginForm">
-            <div class="field">
-              <label for="loginName">Existing user name</label>
-              <input
-                id="loginName"
-                list="userNames"
-                placeholder="Type a real name"
-                required
-              />
-              <datalist id="userNames"></datalist>
-            </div>
-            <div class="actions">
-              <button type="submit">Login</button>
-            </div>
-          </form>
+          <div class="tiny">
+            The dropdown below also loads all existing users from the database.
+          </div>
           <div class="result" id="loginResult">
             Loading users from the backend...
           </div>
@@ -598,11 +615,6 @@
       const apiState = document.getElementById("apiState");
       const loginState = document.getElementById("loginState");
       const loginResult = document.getElementById("loginResult");
-      const apiBaseUrlInput = document.getElementById("apiBaseUrl");
-      const saveApiBaseBtn = document.getElementById("saveApiBaseBtn");
-      const useCurrentOriginBtn = document.getElementById(
-        "useCurrentOriginBtn",
-      );
       const loginScreen = document.getElementById("loginScreen");
       const appScreen = document.getElementById("appScreen");
       const currentUserBox = document.getElementById("currentUserBox");
@@ -613,6 +625,7 @@
       const expenseResult = document.getElementById("expenseResult");
       const userList = document.getElementById("userList");
       const userNames = document.getElementById("userNames");
+      const sampleUsersBox = document.getElementById("sampleUsersBox");
       const expensesTableBody = document.getElementById("expensesTableBody");
 
       function money(value) {
@@ -621,18 +634,6 @@
 
       function pretty(value) {
         return JSON.stringify(value, null, 2);
-      }
-
-      function getApiBaseUrl() {
-        const stored = localStorage.getItem("splitwise-api-base-url");
-        return stored ? stored.trim() : "";
-      }
-
-      function setApiBaseUrl(value) {
-        const trimmed = value.trim();
-        localStorage.setItem("splitwise-api-base-url", trimmed);
-        apiBaseUrlInput.value = trimmed;
-        apiState.textContent = trimmed ? `API: ${trimmed}` : "API: same origin";
       }
 
       function normalizeNameList(text) {
@@ -769,14 +770,11 @@
       }
 
       async function request(path, options = {}) {
-        const baseUrl = getApiBaseUrl();
-        const url = new URL(path, baseUrl || window.location.origin).toString();
-        const response = await fetch(url, {
+        const response = await fetch(path, {
           headers: {
             "Content-Type": "application/json",
             ...(options.headers || {}),
           },
-          mode: baseUrl ? "cors" : "same-origin",
           ...options,
         });
 
@@ -789,19 +787,6 @@
 
         return body;
       }
-
-      saveApiBaseBtn.addEventListener("click", () => {
-        setApiBaseUrl(apiBaseUrlInput.value);
-      });
-
-      useCurrentOriginBtn.addEventListener("click", () => {
-        setApiBaseUrl(window.location.origin);
-      });
-
-      apiBaseUrlInput.value = getApiBaseUrl();
-      apiState.textContent = getApiBaseUrl()
-        ? `API: ${getApiBaseUrl()}`
-        : "API: same origin";
 
       document
         .getElementById("loginForm")
@@ -997,6 +982,18 @@
           const users = await request("/users");
           state.users = Array.isArray(users) ? users : [];
           renderUsers();
+          sampleUsersBox.innerHTML =
+            state.users
+              .slice(0, 2)
+              .map(
+                (user) => `
+            <div class="sample-user">
+              <strong>${user.name}</strong>
+              <div class="tiny">ID ${user.id}</div>
+            </div>
+          `,
+              )
+              .join("") || '<div class="tiny">No sample users found.</div>';
           apiState.textContent = "Users loaded";
 
           const saved = localStorage.getItem("splitwise-current-user");

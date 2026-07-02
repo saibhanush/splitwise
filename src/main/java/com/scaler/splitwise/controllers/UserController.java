@@ -7,6 +7,9 @@ import com.scaler.splitwise.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @AllArgsConstructor
 public class UserController {
@@ -15,7 +18,7 @@ public class UserController {
     public GetUserDto createUSer(@RequestBody CreateUserDto request){
         validate(request);
         User user =service.createUser(request);
-        return GetUserDto.from(user);
+        return toResponse(user);
     }
 
     private void validate(CreateUserDto request) {
@@ -28,11 +31,16 @@ public class UserController {
         return toResponse(service.getUser(id));
     }
 
+    @GetMapping("/users")
+    public List<GetUserDto> getUsers() {
+        return service.getUsers().stream().map(GetUserDto::from).collect(Collectors.toList());
+    }
+
     private GetUserDto toResponse(User user) {
         if (user == null) {
             return null;
         }
 
-        return new GetUserDto(user.getName(), user.getPhoneNumber());
+        return GetUserDto.from(user);
     }
 }

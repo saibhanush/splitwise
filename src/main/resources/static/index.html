@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Splitwise Demo</title>
+    <style>
+      :root {
+        --bg: #081120;
+        --panel: rgba(13, 21, 39, 0.8);
+        --panel-strong: rgba(10, 16, 32, 0.94);
+        --text: #e5eefb;
+        --muted: #8ea3bd;
+        --accent: #31d0aa;
+        --accent-2: #5da8ff;
+        --danger: #fb7185;
+        --border: rgba(255, 255, 255, 0.12);
+        --shadow: 0 18px 56px rgba(0, 0, 0, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        font-family:
+          "Segoe UI",
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background:
+          radial-gradient(
+            circle at top left,
+            rgba(93, 168, 255, 0.25),
+            transparent 30%
+          ),
+          radial-gradient(
+            circle at top right,
+            rgba(49, 208, 170, 0.18),
+            transparent 24%
+          ),
+          linear-gradient(160deg, #020617 0%, #0b1220 55%, #111827 100%);
+      }
+
+      .shell {
+        width: min(1220px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 56px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.5fr 0.9fr;
+        gap: 16px;
+        padding: 28px;
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08),
+          rgba(255, 255, 255, 0.04)
+        );
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2rem, 4.8vw, 4.1rem);
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+      }
+
+      .hero p {
+        margin: 12px 0 0;
+        color: var(--muted);
+        max-width: 65ch;
+        line-height: 1.6;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 9px 13px;
+        border-radius: 999px;
+        border: 1px solid rgba(49, 208, 170, 0.24);
+        background: rgba(49, 208, 170, 0.13);
+        color: #d8fff3;
+        font-size: 0.92rem;
+      }
+
+      .status {
+        display: grid;
+        gap: 10px;
+        justify-items: end;
+        text-align: right;
+        align-content: end;
+      }
+
+      .tiny {
+        font-size: 0.86rem;
+        color: var(--muted);
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .login-screen {
+        min-height: calc(100vh - 120px);
+        display: grid;
+        place-items: center;
+      }
+
+      .login-panel {
+        width: min(640px, 100%);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 18px;
+      }
+
+      .card {
+        grid-column: span 6;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+
+      .card.wide {
+        grid-column: span 12;
+      }
+      .card.third {
+        grid-column: span 4;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: 1.08rem;
+        letter-spacing: 0.01em;
+      }
+
+      p {
+        margin: 0;
+      }
+      .muted {
+        color: var(--muted);
+      }
+
+      form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      label {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(2, 6, 23, 0.66);
+        color: var(--text);
+        padding: 12px 14px;
+        outline: none;
+        font: inherit;
+      }
+
+      textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: rgba(93, 168, 255, 0.85);
+        box-shadow: 0 0 0 4px rgba(93, 168, 255, 0.14);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      button {
+        appearance: none;
+        border: 0;
+        cursor: pointer;
+        border-radius: 14px;
+        padding: 12px 16px;
+        font-weight: 700;
+        color: #04111f;
+        background: linear-gradient(135deg, #31d0aa, #5da8ff);
+        box-shadow: 0 12px 30px rgba(49, 208, 170, 0.16);
+      }
+
+      button.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: none;
+      }
+
+      .result {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--panel-strong);
+        white-space: pre-wrap;
+        word-break: break-word;
+        min-height: 52px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .user-list {
+        display: grid;
+        gap: 10px;
+        max-height: 300px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .user-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .split-grid {
+        display: grid;
+        gap: 10px;
+      }
+      .split-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 0.7fr;
+        gap: 10px;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        align-items: center;
+      }
+      .split-row span:last-child {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .split-ok {
+        color: #c8ffe6;
+        border-left: 3px solid var(--accent);
+        padding-left: 10px;
+      }
+      .split-bad {
+        color: #fecaca;
+        border-left: 3px solid var(--danger);
+        padding-left: 10px;
+      }
+
+      .table {
+        overflow: auto;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(2, 6, 23, 0.42);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: #dbeafe;
+        font-size: 0.84rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      @media (max-width: 960px) {
+        .hero,
+        .card,
+        .card.wide,
+        .card.third {
+          grid-column: span 12;
+        }
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .status {
+          justify-items: start;
+          text-align: left;
+        }
+        .fields {
+          grid-template-columns: 1fr;
+        }
+        .split-row {
+          grid-template-columns: 1fr;
+        }
+        .split-row span:last-child {
+          text-align: left;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" id="heroSection">
+        <div>
+          <div class="badge">Splitwise dashboard</div>
+          <h1>Login, create a group, and split a bill</h1>
+          <p>
+            Use one logged-in user, pick only existing users, build a local
+            group, and check the equal split before saving an expense.
+          </p>
+        </div>
+        <div class="status">
+          <div class="badge" id="apiState">Loading users...</div>
+          <div class="tiny" id="loginState">Not logged in</div>
+        </div>
+      </section>
+
+      <section id="loginScreen" class="login-screen">
+        <article class="panel login-panel">
+          <h2>Login</h2>
+          <p class="muted">Pick one existing user name from the database.</p>
+          <form id="loginForm">
+            <div class="field">
+              <label for="loginName">Existing user name</label>
+              <input
+                id="loginName"
+                list="userNames"
+                placeholder="Type a real name"
+                required
+              />
+              <datalist id="userNames"></datalist>
+            </div>
+            <div class="actions">
+              <button type="submit">Login</button>
+            </div>
+          </form>
+          <div class="result" id="loginResult">
+            Loading users from the backend...
+          </div>
+        </article>
+      </section>
+
+      <section id="appScreen" class="grid hidden">
+        <article class="card third">
+          <h2>Current User</h2>
+          <div class="result" id="currentUserBox">No user logged in.</div>
+          <div class="actions">
+            <button type="button" class="secondary" id="logoutBtn">
+              Logout
+            </button>
+          </div>
+        </article>
+
+        <article class="card third">
+          <h2>Create Group</h2>
+          <form id="groupForm">
+            <div class="field">
+              <label for="groupName">Group name</label>
+              <input id="groupName" placeholder="Trip to Goa" required />
+            </div>
+            <div class="field">
+              <label for="groupMembers">Member names</label>
+              <input
+                id="groupMembers"
+                placeholder="Aman, Priya, Rahul"
+                required
+              />
+            </div>
+            <div class="actions">
+              <button type="submit">Create group</button>
+            </div>
+          </form>
+          <div class="result" id="groupResult">Your group will show here.</div>
+        </article>
+
+        <article class="card third">
+          <h2>Split Preview</h2>
+          <form id="splitForm">
+            <div class="field">
+              <label for="splitAmount">Amount</label>
+              <input
+                id="splitAmount"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="1200"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="splitMembers">Members to split with</label>
+              <input
+                id="splitMembers"
+                placeholder="Aman, Priya, Rahul"
+                required
+              />
+            </div>
+            <div class="actions">
+              <button type="submit">Check split</button>
+            </div>
+          </form>
+          <div class="result" id="splitCheckResult">
+            Split preview will appear here.
+          </div>
+        </article>
+
+        <article class="card wide">
+          <h2>Equal Split Breakdown</h2>
+          <div class="split-grid" id="splitRows"></div>
+          <div class="result" id="splitSummary">No split checked yet.</div>
+        </article>
+
+        <article class="card wide">
+          <h2>Users in Database</h2>
+          <p class="muted">
+            These are the names you can use for login and group creation.
+          </p>
+          <div class="user-list" id="userList"></div>
+        </article>
+
+        <article class="card wide">
+          <h2>Create Expense From Group</h2>
+          <form id="expenseForm">
+            <div class="fields">
+              <div class="field">
+                <label for="expenseDescription">Description</label>
+                <input
+                  id="expenseDescription"
+                  placeholder="Hotel stay"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="expenseAmount">Amount</label>
+                <input
+                  id="expenseAmount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="4500"
+                  required
+                />
+              </div>
+            </div>
+            <div class="fields">
+              <div class="field">
+                <label for="expenseCurrency">Currency</label>
+                <select id="expenseCurrency">
+                  <option>INR</option>
+                  <option>USD</option>
+                  <option>AUD</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="expenseGroupMembers">Expense members</label>
+                <input
+                  id="expenseGroupMembers"
+                  placeholder="Aman, Priya, Rahul"
+                  required
+                />
+              </div>
+            </div>
+            <div class="actions">
+              <button type="submit">Create expense</button>
+              <button type="button" class="secondary" id="fillFromGroup">
+                Use group members
+              </button>
+            </div>
+          </form>
+          <div class="result" id="expenseResult">
+            Expense creation result will appear here.
+          </div>
+        </article>
+
+        <article class="card wide">
+          <h2>Saved Expenses</h2>
+          <div class="actions">
+            <button type="button" id="loadExpenses">Load all expenses</button>
+          </div>
+          <div class="table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Currency</th>
+                  <th>Created By</th>
+                  <th>Participants</th>
+                </tr>
+              </thead>
+              <tbody id="expensesTableBody">
+                <tr>
+                  <td colspan="6" class="muted">
+                    Load expenses to see records here.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const state = {
+        users: [],
+        currentUser: null,
+        currentGroup: null,
+        latestSplit: null,
+      };
+
+      const apiState = document.getElementById("apiState");
+      const loginState = document.getElementById("loginState");
+      const loginResult = document.getElementById("loginResult");
+      const loginScreen = document.getElementById("loginScreen");
+      const appScreen = document.getElementById("appScreen");
+      const currentUserBox = document.getElementById("currentUserBox");
+      const groupResult = document.getElementById("groupResult");
+      const splitCheckResult = document.getElementById("splitCheckResult");
+      const splitSummary = document.getElementById("splitSummary");
+      const splitRows = document.getElementById("splitRows");
+      const expenseResult = document.getElementById("expenseResult");
+      const userList = document.getElementById("userList");
+      const userNames = document.getElementById("userNames");
+      const expensesTableBody = document.getElementById("expensesTableBody");
+
+      function money(value) {
+        return Number(value).toFixed(2);
+      }
+
+      function pretty(value) {
+        return JSON.stringify(value, null, 2);
+      }
+
+      function normalizeNameList(text) {
+        return text
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function getUserByName(name) {
+        const normalized = name.trim().toLowerCase();
+        return (
+          state.users.find(
+            (user) => (user.name || "").toLowerCase() === normalized,
+          ) || null
+        );
+      }
+
+      function getMembersFromNames(text) {
+        const names = normalizeNameList(text);
+        const matched = names.map((name) => getUserByName(name));
+        const missing = names.filter((name, index) => !matched[index]);
+
+        if (missing.length) {
+          throw new Error(`Unknown users: ${missing.join(", ")}`);
+        }
+
+        return matched;
+      }
+
+      function computeEqualSplit(total, members) {
+        const cents = Math.round(Number(total) * 100);
+        const base = Math.floor(cents / members.length);
+        let remainder = cents - base * members.length;
+
+        return members.map((member) => {
+          const addCent = remainder > 0 ? 1 : 0;
+          if (remainder > 0) {
+            remainder -= 1;
+          }
+
+          return {
+            user: member,
+            amount: (base + addCent) / 100,
+            remainderReceiver: addCent === 1,
+          };
+        });
+      }
+
+      function renderUsers() {
+        if (state.users.length === 0) {
+          userNames.innerHTML = "";
+          userList.innerHTML = '<div class="muted">No users found.</div>';
+          return;
+        }
+
+        userNames.innerHTML = state.users
+          .map((user) => `<option value="${user.name}"></option>`)
+          .join("");
+        userList.innerHTML = state.users
+          .map(
+            (user) => `
+        <div class="user-card">
+          <div>
+            <strong>${user.name}</strong>
+            <div class="tiny">ID ${user.id} · ${user.phoneNumber || "no phone"}</div>
+          </div>
+          <button type="button" class="secondary" data-pick-user="${user.name}">Pick</button>
+        </div>
+      `,
+          )
+          .join("");
+
+        userList.querySelectorAll("[data-pick-user]").forEach((button) => {
+          button.addEventListener("click", () => {
+            document.getElementById("loginName").value =
+              button.getAttribute("data-pick-user");
+          });
+        });
+      }
+
+      function renderCurrentUser() {
+        if (!state.currentUser) {
+          currentUserBox.textContent = "No user logged in.";
+          loginState.textContent = "Not logged in";
+          return;
+        }
+
+        currentUserBox.textContent = `${state.currentUser.name} (ID ${state.currentUser.id})`;
+        loginState.textContent = `Logged in as ${state.currentUser.name}`;
+      }
+
+      function showApp() {
+        loginScreen.classList.add("hidden");
+        appScreen.classList.remove("hidden");
+      }
+
+      function showLogin() {
+        appScreen.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+      }
+
+      function renderSplitPreview(total, members) {
+        const splits = computeEqualSplit(total, members);
+        const totalShare = splits.reduce((sum, item) => sum + item.amount, 0);
+        const valid = Math.abs(Number(total) - totalShare) < 0.01;
+
+        state.latestSplit = splits;
+        splitSummary.className = valid ? "split-ok" : "split-bad";
+        splitSummary.textContent = valid
+          ? `Split is valid. ${members.length} people share ${money(totalShare)} and the sum matches the entered amount ${money(total)}.`
+          : `Split is off. Calculated ${money(totalShare)} but expected ${money(total)}.`;
+
+        splitRows.innerHTML = splits
+          .map(
+            (item) => `
+        <div class="split-row">
+          <span>${item.user.name}</span>
+          <span>${item.remainderReceiver ? "base + 0.01" : "base share"}</span>
+          <span>${money(item.amount)}</span>
+        </div>
+      `,
+          )
+          .join("");
+
+        splitCheckResult.textContent = pretty({
+          total: Number(total),
+          members: members.map((member) => member.name),
+          shares: splits.map((item) => ({
+            name: item.user.name,
+            amount: item.amount,
+          })),
+        });
+      }
+
+      async function request(path, options = {}) {
+        const response = await fetch(path, {
+          headers: {
+            "Content-Type": "application/json",
+            ...(options.headers || {}),
+          },
+          ...options,
+        });
+
+        const text = await response.text();
+        const body = text ? JSON.parse(text) : null;
+
+        if (!response.ok) {
+          throw new Error(body?.message || body?.error || response.statusText);
+        }
+
+        return body;
+      }
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          try {
+            const user = getUserByName(
+              document.getElementById("loginName").value,
+            );
+            if (!user) {
+              throw new Error("Pick a real existing user name.");
+            }
+
+            state.currentUser = user;
+            localStorage.setItem(
+              "splitwise-current-user",
+              JSON.stringify({ id: user.id, name: user.name }),
+            );
+            renderCurrentUser();
+            showApp();
+            loginResult.textContent = `Logged in as ${user.name}.`;
+            apiState.textContent = "Logged in";
+          } catch (error) {
+            loginResult.textContent = error.message;
+          }
+        });
+
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        state.currentUser = null;
+        state.currentGroup = null;
+        state.latestSplit = null;
+        localStorage.removeItem("splitwise-current-user");
+        renderCurrentUser();
+        showLogin();
+        apiState.textContent = "Logged out";
+      });
+
+      document
+        .getElementById("groupForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          try {
+            if (!state.currentUser) {
+              throw new Error("Login first.");
+            }
+
+            const members = getMembersFromNames(
+              document.getElementById("groupMembers").value,
+            );
+            if (!members.some((member) => member.id === state.currentUser.id)) {
+              members.unshift(state.currentUser);
+            }
+
+            state.currentGroup = {
+              name: document.getElementById("groupName").value.trim(),
+              createdBy: state.currentUser,
+              members,
+            };
+
+            document.getElementById("expenseGroupMembers").value = members
+              .map((member) => member.name)
+              .join(", ");
+            groupResult.textContent = pretty({
+              name: state.currentGroup.name,
+              createdBy: state.currentUser.name,
+              members: members.map((member) => ({
+                id: member.id,
+                name: member.name,
+              })),
+            });
+            apiState.textContent = "Group created locally";
+          } catch (error) {
+            groupResult.textContent = error.message;
+          }
+        });
+
+      document
+        .getElementById("splitForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          try {
+            const amount = Number(document.getElementById("splitAmount").value);
+            const members = getMembersFromNames(
+              document.getElementById("splitMembers").value,
+            );
+            renderSplitPreview(amount, members);
+            apiState.textContent = "Split preview ready";
+          } catch (error) {
+            splitCheckResult.textContent = error.message;
+          }
+        });
+
+      document.getElementById("fillFromGroup").addEventListener("click", () => {
+        if (!state.currentGroup) {
+          expenseResult.textContent = "Create a group first.";
+          return;
+        }
+
+        document.getElementById("expenseGroupMembers").value =
+          state.currentGroup.members.map((member) => member.name).join(", ");
+      });
+
+      document
+        .getElementById("expenseForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          try {
+            if (!state.currentUser) {
+              throw new Error("Login first.");
+            }
+
+            const members = getMembersFromNames(
+              document.getElementById("expenseGroupMembers").value,
+            );
+            const amount = Number(
+              document.getElementById("expenseAmount").value,
+            );
+            const description = document
+              .getElementById("expenseDescription")
+              .value.trim();
+            const currency = document.getElementById("expenseCurrency").value;
+            const shares = computeEqualSplit(amount, members);
+
+            const payload = {
+              description,
+              amount,
+              currency,
+              createdBy: state.currentUser.id,
+              users: members.map((member) => member.id),
+              paidBy: { [state.currentUser.id]: amount },
+              owedBy: Object.fromEntries(
+                shares.map((item) => [
+                  item.user.id,
+                  Number(item.amount.toFixed(2)),
+                ]),
+              ),
+            };
+
+            const result = await request("/expense", {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+
+            expenseResult.textContent = pretty({
+              saved: result,
+              split: shares.map((item) => ({
+                name: item.user.name,
+                amount: item.amount,
+              })),
+            });
+            renderSplitPreview(amount, members);
+            apiState.textContent = "Expense created successfully";
+          } catch (error) {
+            expenseResult.textContent = error.message;
+            apiState.textContent = "Expense creation failed";
+          }
+        });
+
+      document
+        .getElementById("loadExpenses")
+        .addEventListener("click", async () => {
+          try {
+            const result = await request("/expense");
+            const rows = Array.isArray(result) ? result : [];
+
+            if (rows.length === 0) {
+              expensesTableBody.innerHTML =
+                '<tr><td colspan="6" class="muted">No expenses found yet.</td></tr>';
+              return;
+            }
+
+            expensesTableBody.innerHTML = rows
+              .map(
+                (expense) => `
+          <tr>
+            <td>${expense.id ?? ""}</td>
+            <td>${expense.description ?? ""}</td>
+            <td>${expense.amount ?? ""}</td>
+            <td>${expense.currency ?? ""}</td>
+            <td>${expense.createdBy?.id ?? expense.createdBy?.name ?? ""}</td>
+            <td>${Array.isArray(expense.users) ? expense.users.map((user) => user.id ?? user.name ?? "").join(", ") : ""}</td>
+          </tr>
+        `,
+              )
+              .join("");
+          } catch (error) {
+            expensesTableBody.innerHTML = `<tr><td colspan="6" class="muted">${error.message}</td></tr>`;
+          }
+        });
+
+      async function initialize() {
+        try {
+          const users = await request("/users");
+          state.users = Array.isArray(users) ? users : [];
+          renderUsers();
+          apiState.textContent = "Users loaded";
+
+          const saved = localStorage.getItem("splitwise-current-user");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            const match = state.users.find((user) => user.id === parsed.id);
+            if (match) {
+              state.currentUser = match;
+              renderCurrentUser();
+              showApp();
+            }
+          }
+
+          renderCurrentUser();
+        } catch (error) {
+          loginResult.textContent = `Failed to load users: ${error.message}`;
+          apiState.textContent = "Failed to load users";
+        }
+      }
+
+      initialize();
+    </script>
+  </body>
+</html>

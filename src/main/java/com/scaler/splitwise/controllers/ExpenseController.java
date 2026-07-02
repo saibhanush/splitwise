@@ -19,10 +19,10 @@ public class ExpenseController {
     }
     @GetMapping("/expense/{id}")
     public Expense getExpense(@PathVariable Long id) {
-        return null;
+        return expenseService.getExpense(id);
     }
     @GetMapping("/expense")
     public List<Expense> getExpenses(){
-        return null;
+        return expenseService.getExpenses();
     }
 }

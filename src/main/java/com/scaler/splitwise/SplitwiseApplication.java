@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.util.List;
-
+import com.scaler.splitwise.repositories.UserRepository; 
+import com.scaler.splitwise.models.User;
 // Your IDE will likely need to auto-import your User and UserRepository here
 
 @SpringBootApplication
